@@ -69,6 +69,9 @@ chmod 755 /system/etc/init.d/*
 # run init.d scripts
 mount -t rootfs -o remount,rw rootfs
 run-parts /system/etc/init.d
+fstrim -v /system
+fstrim -v /cache
+fstrim -v /data
 
 # fix gapps wakelock
 sleep 40
