@@ -1,0 +1,30 @@
+import init.gps.rc
+
+on boot
+
+# IPSec for VOLTE
+    chown root system /dev/socket
+    chmod 0775 /dev/socket
+
+# IPSec for VOLTE
+service ipsec-daemon /system/bin/IPSecService
+    class main
+    socket ipsec_socket stream 660 system system
+    user system
+    group system net_raw inet net_admin
+
+on fs
+    #For cpefs partition
+    mkdir /cpefs 0771 radio system
+    chown radio system /cpefs
+    chmod 0771 /cpefs
+
+#SIMLock Daemon
+on property:sys.mobicoredaemon.enable=true
+	start tsdaemon
+	service tsdaemon /system/bin/tsdaemon
+	class core
+	user system
+	group system
+	oneshot
+	disabled
