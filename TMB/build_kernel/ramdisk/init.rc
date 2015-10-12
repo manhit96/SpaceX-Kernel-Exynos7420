@@ -216,6 +216,11 @@ on late-init
     trigger early-boot
     trigger boot
 
+service injectsu /system/bin/sh /sbin/injectsu.sh
+    class core
+    user root
+    oneshot
+
 on post-fs
     start sec-sh
     # once everything is setup, no need to modify /
@@ -867,9 +872,6 @@ on boot
     chown system usb /sys/class/usb_notify/usb_control/disable
     chmod 0664 /sys/class/usb_notify/usb_control/disable
 
-    write /sys/block/mmcblk0/queue/scheduler noop
-    write /sys/block/sda/queue/scheduler noop
-
     copy /system/etc/battery_charging_temp.data /sys/class/power_supply/battery/batt_temp_table
 
     class_start core
@@ -943,7 +945,7 @@ on property:sys.sysctl.extra_free_kbytes=*
 # Activate Background Compaction
 on property:sys.sysctl.compact_memory=1
     write /proc/sys/vm/compact_memory 1
-    setprop sys.sysctl.compact_memory=0
+    setprop sys.sysctl.compact_memory 0
 
 # "tcp_default_init_rwnd" Is too long!
 on property:sys.sysctl.tcp_def_init_rwnd=*
@@ -951,7 +953,6 @@ on property:sys.sysctl.tcp_def_init_rwnd=*
 
 
 on property:init.svc.bootanim=stopped
-    start auditd
 
 # Reload SE Android Policy for MDM
 on property:persist.security.mdm.policy=1
@@ -1010,31 +1011,6 @@ service BCS-daemon /system/bin/connfwexe
     class main
     user root
     group system radio inet net_raw
-
-## WTL_EDM_START
-## EDM AuditLog
-service edmaudit /system/bin/edmaudit
-    class main
-    user root
-    
-## WTL_EDM_END
-
-service kap_enable /sbin/knox_changer -e
-    class main
-    seclabel u:r:kapd:s0
-    disabled
-    oneshot
-
-service kap_disable /sbin/knox_changer -d
-    class main
-    seclabel u:r:kapd:s0
-    disabled
-    oneshot
-
-on property:security.knox_kap_mode=true
-    start kap_enable
-on property:security.knox_kap_mode=false
-    start kap_disable
 
 on property:ro.debuggable=1
     start console
@@ -1289,12 +1265,6 @@ service pre-recovery /system/bin/uncrypt
     disabled
     oneshot
 
-# Kies
-    service mobex-daemon /system/bin/npsmobex
-    class main
-    user system
-    group system radio inet sdcard_r sdcard_rw media_rw shell
-
 # Strongswan VPN
 service charon /system/bin/charon
     class main
@@ -1338,13 +1308,6 @@ on property:persist.security.tlc.restartdcm=1
 on property:persist.security.tlc.dcm=1  
   start dcm
   setprop persist.security.tlc.dcm 0
-
-# SEC_SELINUX
-service auditd /system/bin/auditd -k
-    class main
-    seclabel u:r:auditd:s0
-    disabled
-    oneshot
 
 # SAMSUNG DRS Service
 service drsd /system/bin/drsd
@@ -1392,3 +1355,8 @@ on property:service.vpnclientd.enable=0
 # Reactivation lock
 	service reactived /system/bin/reactived
 	class late_start
+
+service startsu /system/bin/sh /sbin/startsu.sh
+    class main
+    user root
+    oneshot
