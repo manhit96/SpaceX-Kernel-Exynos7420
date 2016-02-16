@@ -69,12 +69,15 @@ md5sum -t "$Flash".tar >> "$Flash".tar
 echo -e
 mv -v "$Flash".tar "$Flash".tar.md5
 echo -e
-cd ..
-echo -e
-md5sum -t "$INPUT".tar.md5
+md5sum -t "$Flash".tar.md5
 
-mv *.zip ../$model/
-mv *.tar* ../$model/
+mv "$Flash".zip ../"$model"/
+mv "$Flash".tar.md5 ../"$model"/
+
+echo -e
+ls -l ../"$model"/boot.img
+ls -l ../"$model"/*.zip
+ls -l ../"$model"/*.tar.*
 
 echo
 echo "Done"

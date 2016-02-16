@@ -19,7 +19,7 @@ echo "SM-$model:"
 # updater-script setup
 sed -i -e '/ui_print("~~~~~~~~~ SpaceX Kernel for/c\ui_print("~~~~~~ SpaceX Kernel for Galaxy S6/S6 Edge ~~~~~~");' $kernelzip/META-INF/com/google/android/updater-script
 
-sed -i -e '/by ManhIT ~~~~~~~~~~~~~~~");/c\ui_print("~~~~~~~~~~~~~~~ G920S - by ManhIT ~~~~~~~~~~~~~~~");' $kernelzip/META-INF/com/google/android/updater-script
+sed -i -e '/by ManhIT ~~~~~~~~~~~~~~~");/c\ui_print("~~~~~~~~~~~~~~~ G920K - by ManhIT ~~~~~~~~~~~~~~~");' $kernelzip/META-INF/com/google/android/updater-script
 
 sed -i -e '/package_extract_file("boot.img/c\package_extract_file("boot.img", "/dev/block/platform/15570000.ufs/by-name/BOOT");' $kernelzip/META-INF/com/google/android/updater-script
 
@@ -69,12 +69,15 @@ md5sum -t "$Flash".tar >> "$Flash".tar
 echo -e
 mv -v "$Flash".tar "$Flash".tar.md5
 echo -e
-cd ..
-echo -e
-md5sum -t "$INPUT".tar.md5
+md5sum -t "$Flash".tar.md5
 
-mv *.zip ../$model/
-mv *.tar* ../$model/
+mv "$Flash".zip ../"$model"/
+mv "$Flash".tar.md5 ../"$model"/
+
+echo -e
+ls -l ../"$model"/boot.img
+ls -l ../"$model"/*.zip
+ls -l ../"$model"/*.tar.*
 
 echo
 echo "Done"
