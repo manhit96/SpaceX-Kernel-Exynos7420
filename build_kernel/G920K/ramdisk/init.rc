@@ -1110,9 +1110,6 @@ on property:sys.sysctl.tcp_def_init_rwnd=*
     write /proc/sys/net/ipv4/tcp_default_init_rwnd ${sys.sysctl.tcp_def_init_rwnd}
 
 
-on property:init.svc.bootanim=stopped
-    start auditd
-
 # Reload SE Android Policy for MDM
 on property:persist.security.mdm.policy=1
     setprop selinux.reload_policy 1
@@ -1601,13 +1598,6 @@ on property:persist.security.tlc.dcm=1
 on property:persist.security.tlc.esecomm=1  
   start esecomm
   setprop persist.security.tlc.esecomm 0
-
-# SEC_SELINUX
-service auditd /system/bin/auditd -k
-    class main
-    seclabel u:r:auditd:s0
-    disabled
-    oneshot
 
 on property:sys.boot_completed=1
     write /sys/block/mmcblk0/queue/scheduler cfq
