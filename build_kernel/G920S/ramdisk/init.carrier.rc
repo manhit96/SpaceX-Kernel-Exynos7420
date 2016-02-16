@@ -1,0 +1,45 @@
+import init.gps.rc
+
+on boot
+
+ # tdmb
+    chown system system /dev/tdmb
+    chmod 0660 /dev/tdmb
+
+on fs
+
+service dmb /system/bin/dmbserver
+    class main
+    user media
+    group system radio inet misc audio camera graphics net_bt net_bt_admin sdcard_rw sdcard_r shell media_rw
+
+on post-fs-data
+
+# SKT PM PlayReady
+    mkdir /data/playready 771 system skt
+    chown system skt /data/playready
+    chmod 0771 /data/playready
+
+# SKT DRM for hoppin
+    mkdir /data/.sktdrm 0775
+    chown system system /data/.sktdrm
+    chmod 0775 /data/.sktdrm
+
+on post-fs-data
+
+# MOBILE OFFICE Permanent memory access
+    mkdir /efs/security 0771 root root
+    chown radio system /efs/security
+    chmod 0771 /efs/security
+
+#SLocation
+service cellgeofenced /system/bin/cellgeofenced
+    class main
+    socket cellgeofence seqpacket 0660 gps system
+    user gps
+    group system inet
+
+service diag_knight /system/bin/diag_knight
+     class main
+     user root
+     group system radio log
