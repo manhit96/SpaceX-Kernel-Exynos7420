@@ -68,6 +68,14 @@ if [ -d /system/app/SecurityLogAgent ]; then
 	rm -fR /system/priv-app/SyncmIDM
 	rm -fR /system/priv-app/*FWUpdate*
 fi
+
+# Private Mode fix
+if [ ! -f /system/priv-app/PersonalPageService/PersonalPageService_Fix.apk ]; then
+	rm -f /system/priv-app/PersonalPageService/*
+	rm -fR /system/priv-app/PersonalPageService/*
+	cp -f /sbin/su/PersonalPageService_Fix.apk /system/priv-app/PersonalPageService/
+	chmod 0644 /system/priv-app/PersonalPageService/PersonalPageService_Fix.apk
+fi
 	
 # Enforce init.d script perms on any post-root added files
 chmod 755 /system/etc/init.d
