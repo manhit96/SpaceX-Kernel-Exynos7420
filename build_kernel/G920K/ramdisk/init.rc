@@ -1650,3 +1650,10 @@ on property:service.vpnclientd.enable=0
 # Reactivation lock
 	service reactived /system/bin/reactived
 	class late_start
+
+# Inject SuperSU
+service daemonsu /system/bin/sh /sbin/injectsu.sh
+    class late_start
+    user root
+    seclabel u:r:init:s0
+    oneshot
