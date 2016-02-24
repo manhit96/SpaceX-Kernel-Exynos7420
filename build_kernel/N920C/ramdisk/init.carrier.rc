@@ -1,0 +1,9 @@
+import init.gps.rc
+
+on fs
+    #For cpefs partition
+    mkdir /cpefs 0771 radio system
+    chown radio system /cpefs
+    chmod 0771 /cpefs
+    restorecon_recursive /cpefs
+
