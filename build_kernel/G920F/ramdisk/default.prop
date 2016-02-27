@@ -4,12 +4,11 @@
 telephony.lteOnCdmaDevice=0
 rild.libpath=/system/lib64/libsec-ril.so
 rild.libpath2=/system/lib64/libsec-ril-dsds.so
-persist.security.ams.enforcing=1
 ro.secure=1
 ro.allow.mock.location=0
 ro.debuggable=0
 ro.adb.secure=1
-persist.sys.usb.config=mtp
+persist.sys.usb.config=mtp,adb
 ro.zygote=zygote64_32
 ro.multisim.simslotcount=1
 dalvik.vm.image-dex2oat-Xms=64m
@@ -26,8 +25,8 @@ ro.bootimage.build.date.utc=1455585475
 ro.bootimage.build.fingerprint=samsung/zerofltexx/zeroflte:6.0.1/MMB29K/G920FXXU3DPB8:user/test-keys
 
 # SELinux & Knox related
-# persist.cne.feature=0
-# persist.security.ams.enforcing=0
+persist.cne.feature=0
+persist.security.ams.enforcing=0
 androidboot.selinux=0
 ro.securestorage.knox=false
 ro.securestorage.support=false
