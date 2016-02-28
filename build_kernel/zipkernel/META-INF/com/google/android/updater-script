@@ -56,7 +56,7 @@ ui_print(" ");
 
 #intro on recovery console
 ui_print("~~~~~~ SpaceX Kernel for Galaxy S6/S6 Edge ~~~~~~");
-ui_print("~~~~~~~~~~~~~~~ G920K - by ManhIT ~~~~~~~~~~~~~~~");
+ui_print("~~~~~~~~~~~~~~~ G920F - by ManhIT ~~~~~~~~~~~~~~~");
 ui_print(" ");
 
 
