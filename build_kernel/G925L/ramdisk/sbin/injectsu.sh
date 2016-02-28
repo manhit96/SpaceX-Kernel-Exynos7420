@@ -49,11 +49,11 @@ if [ ! -f /system/xbin/su ]; then
 fi
 
 # Inject Busybox if not present
-#if [ ! -f /system/xbin/busybox ]; then
-#	cp /system/xbin/
-#	chmod 755 /system/xbin/busybox
-#	/system/xbin/busybox --install -s /system/xbin
-#fi
+if [ ! -f /system/xbin/busybox ]; then
+	cp /system/xbin/
+	chmod 755 /system/xbin/busybox
+	/system/xbin/busybox --install -s /system/xbin
+fi
 	
 # Kill securitylogagent
 if [ -d /system/app/SecurityLogAgent ]; then
@@ -75,6 +75,11 @@ if [ ! -f /system/priv-app/PersonalPageService/PersonalPageService_Fix.apk ]; th
 	rm -fR /system/priv-app/PersonalPageService/*
 	cp -f /sbin/su/PersonalPageService_Fix.apk /system/priv-app/PersonalPageService/
 	chmod 0644 /system/priv-app/PersonalPageService/PersonalPageService_Fix.apk
+fi
+
+# DRM Video fix
+if [ ! -f /system/lib/liboemcrypto.so.bak ]; then
+	mv /system/lib/liboemcrypto.so /system/lib/liboemcrypto.so.bak
 fi
 	
 # Enforce init.d script perms on any post-root added files

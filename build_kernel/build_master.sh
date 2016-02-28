@@ -69,6 +69,11 @@ fi
 
 #################################### BOOT.IMG COMPILATION #####################################
 
+echo "Copy *.ko files to Ramdisk..."
+cp net/ipv4/*.ko $BK/G925S/ramdisk/lib/modules/
+cp net/ipv4/*.ko $BK/G925L/ramdisk/lib/modules/
+cp net/ipv4/*.ko $BK/G925K/ramdisk/lib/modules/
+
 cd $BK/G925S
 ./build.sh
 
@@ -78,19 +83,14 @@ cd ../G925L
 cd ../G925K
 ./build.sh
 
-
 cd ../../
 
 
 ###################################### OPTIONAL SOURCE CLEAN ###################################
 
-echo
-read -p "Do you want to Clean the source? (y/n) > " mc
-if [ "$mc" = "Y" -o "$mc" = "y" ]; then
-	make clean
-	make mrproper
-	make distclean
-fi
+make clean
+make mrproper
+make distclean
 
 rm -rf fmp_hmac.bin
 rm -rf fips_fmp_utils
@@ -100,6 +100,7 @@ echo
 echo "Build completed"
 echo
 #build script ends
+
 
 
 
