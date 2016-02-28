@@ -69,7 +69,8 @@ fi
 
 #################################### BOOT.IMG COMPILATION #####################################
 
-read -p "Press [Enter] key to make boot.img..."
+echo "Copy *.ko files to Ramdisk..."
+cp net/ipv4/*.ko $BK/G925F/ramdisk/lib/modules/
 
 cd $BK/G920F
 ./build.sh
@@ -79,13 +80,9 @@ cd ../../
 
 ###################################### OPTIONAL SOURCE CLEAN ###################################
 
-echo
-read -p "Do you want to Clean the source? (y/n) > " mc
-if [ "$mc" = "Y" -o "$mc" = "y" ]; then
-	make clean
-	make mrproper
-	make distclean
-fi
+make clean
+make mrproper
+make distclean
 
 rm -rf fmp_hmac.bin
 rm -rf fips_fmp_utils

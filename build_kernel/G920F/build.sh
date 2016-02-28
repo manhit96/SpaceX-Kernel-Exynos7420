@@ -9,7 +9,7 @@ echo
 ######################################## SETUP #########################################
 
 # Set variables
-Flash=SpaceX-Kernel_MM_RC2_G920F
+Flash=SpaceX-Kernel_MM_RC2.1_G920F
 BK=build_kernel
 kernelzip=../zipkernel
 model=G920F
