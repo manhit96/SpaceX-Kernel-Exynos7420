@@ -9,7 +9,7 @@ echo
 ######################################## SETUP #########################################
 
 # Set variables
-Flash=SpaceX-Kernel_MM_Dev_N920C
+Flash=SpaceX-Kernel_MM_RC2.1_N920C
 BK=build_kernel
 kernelzip=../zipkernel
 model=N920C
