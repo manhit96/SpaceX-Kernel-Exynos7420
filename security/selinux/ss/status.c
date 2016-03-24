@@ -121,7 +121,7 @@ void selinux_status_update_policyload(int seqno)
 		smp_wmb();
 
 		status->policyload = seqno;
-		status->deny_unknown = !security_get_allow_unknown();
+		status->deny_unknown = 0;
 
 		smp_wmb();
 		status->sequence++;
