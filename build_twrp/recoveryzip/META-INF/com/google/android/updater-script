@@ -1,0 +1,4 @@
+ui_print("Flashing Recovery...");
+package_extract_file("recovery.img", "/dev/block/platform/15570000.ufs/by-name/RECOVERY");
+ui_print("Done, please reboot recovery...");
+run_program("/sbin/sync");
