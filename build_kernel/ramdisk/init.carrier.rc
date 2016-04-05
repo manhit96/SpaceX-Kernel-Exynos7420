@@ -1,0 +1,208 @@
+# Copyright (C) 2012 The Android Open Source Project
+#
+# IMPORTANT: Do not create world writable files or directories.
+# This is a common source of Android security bugs.
+#
+
+on boot
+
+# JPN: For MobileTV [ISDBT] \android\device\samsung\zeroltedcm\init.carrier.rc
+    chown system system /dev/isdbt
+    chmod 0660 /dev/isdbt
+    chown system system /dev/s3c-tsi
+    chmod 0660 /dev/s3c-tsi
+
+# JPN: For ISDTB HV charger voltage reduction
+    chown system system /sys/class/sec/switch/hv_sel
+    chmod 0660 /sys/class/sec/switch/hv_sel
+
+# JPN: For MobileTV [ISDBT] \android\device\samsung\zeroltedcm\init.carrier.rc
+    service mobileTV /system/bin/broadcastProcessObserver
+    class main
+    user system
+    group system radio audio camera graphics inet net_bt net_bt_admin net_raw sdcard_rw sdcard_r shell media media_rw
+
+# JPN: For FullSegDTV [ISDBT] \android\device\samsung\zeroltedcm\init.carrier.rc
+    service dtvserver /system/bin/dtvserver
+    class main
+    user system
+    group system sdcard_rw sdcard_r shell media media_rw inet net_raw
+
+on init
+    export EXTERNAL_STORAGE_DOCOMO ""
+
+# permission for IPSec
+    chown root system /dev/socket
+    chmod 0775 /dev/socket
+#carrier
+    mkdir /carrier 0771 system system
+    export PHONEBOOK_EXCHANGE_PKG_DOCOMO "com.samsung.android.exchange"
+
+# Tmm Add Start
+service mmbcacasdrmmw /system/bin/MmbCaCasDrmMw
+    class main
+    socket MmbCaCasDrmMw stream 666
+    user system
+    group mmb system radio sdcard_r sdcard_rw shell inet net_raw media media_rw mmbisv
+
+service mmbfcctlmw /system/bin/MmbFcCtlMw
+    class main
+    user system
+    group mmb system log mount sdcard_rw media media_rw sdcard_r shell net_raw mmbisv camera
+
+service mmbstservice /system/bin/MmbStCtlMwService
+    class main
+    user system
+    group mmb system radio audio camera graphics inet net_bt net_bt_admin net_raw sdcard_rw sdcard_r shell media media_rw mmbisv
+
+service mmbmp4 /system/bin/MmbFcMp4MwServer
+    class main
+    user system
+    group mmb sdcard_r sdcard_rw shell media media_rw mmbisv camera
+
+service mmbfclicemw /system/bin/MmbFcLiceMwServer
+    class main
+    user system
+    group mmb sdcard_rw inet media media_rw mmbisv
+
+service mmbcmservice /system/bin/MmbStRecCmMwService
+    class late_start
+    user system
+    group mmb system log mount net_raw sdcard_rw sdcard_r shell media media_rw mmbisv
+
+# Tmm Add End
+
+on post-fs-data
+
+# 3LM settings
+	setprop ro.3lm.production 1
+	setprop ro.3LM.extended 1
+	setprop ro.3LM.oem_sd_encryption 1
+	setprop ro.3LM.oem_manifest 3
+
+# Tmm Add Start
+    mkdir /data/mmb
+    mkdir /data/mmb/MmbCaCasDrmMw 0700 system sdcard_rw
+    mkdir /data/mmb/MmbFcCtlMw 0700 system sdcard_rw
+    mkdir /data/mmb/MmbFcCtlMw/dic 0700 system sdcard_rw
+    mkdir /data/mmb/MmbStCtlMw 0700 system sdcard_rw
+    mkdir /data/mmb/MmbFcMp4Mw 0700 system sdcard_rw
+    mkdir /data/mmb/common 0770 system sdcard_rw
+    mkdir /data/mmb/common/MmbFcCtlMw 0700 system sdcard_rw
+        chown system mmb /data/mmb
+
+    mkdir data/mmb/common/fcctl 0775 system sdcard_rw
+        chown system sdcard_rw data/mmb/common/fcctl
+
+    mkdir data/mmb/common/streccm 0775 system sdcard_rw
+        chown system sdcard_rw data/mmb/common/streccm
+    mkdir data/mmb/common/streccm 0775 system sdcard_rw
+        chown system sdcard_rw data/mmb/common/streccm
+
+    chmod 775 /data/mmb
+    mkdir /data/mmb/MmbFcCtlMwMnt
+    chown system sdcard_rw /data/mmb/MmbFcCtlMwMnt
+    chmod 755 /data/mmb/MmbFcCtlMwMnt
+
+	mkdir /data/.dcmdrm/.sec_sctime
+	chmod 775 /data/.dcmdrm/.sec_sctime
+	chown system system /data/.dcmdrm/.sec_sctime
+
+    chmod 664 /dev/hw_random
+    chmod 640 /dev/tzic
+    chown system mmb /dev/tzic
+
+    chmod 0770 /data/mmb/common/manifest
+    chown root mmb /data/mmb/common/manifest
+# Tmm Add End
+
+# Japan Add FeliCa
+    mkdir /efs/sec_efs/FeliCaLock 0770 system felicalock
+
+# Japan Add NFC Type Setting(Osaifu.cfg)
+    mkdir /data/misc/osaifu 0755 system system
+    copy /system/etc/osaifu/osaifu.cfg /data/misc/osaifu/osaifu.cfg
+    chmod 644 /data/misc/osaifu/osaifu.cfg
+    chown system system /data/misc/osaifu/osaifu.cfg
+
+# JPN: For MobileTV [ISDBT] \android\device\samsung\zeroltedcm\init.carrier.rc
+    mkdir /data/one-seg 0775 system system
+    chown system system /data/one-seg
+    chmod 0775 /data/one-seg
+    
+# Fullseg
+	mkdir /data/misc/multimedia 0700 system system
+	mkdir /data/misc/multimedia/BML 0700 system system
+
+# NTT_NEXTI_PV_PLAYREADY - S 
+    mkdir /data/DxDrm 0760 media media 
+    mkdir /data/dxprdy 0760 media media 
+    mkdir /data/dxprdy/dxprdy 0760 media media 
+# NTT_NEXTI_PV_PLAYREADY - E 
+
+# IPSec for VOLTE
+service ipsec-daemon /system/bin/IPSecService
+    class main
+    socket ipsec_socket stream 660 system system
+    user system
+    group system net_raw inet net_admin
+
+on fs
+# this is for QCOM CP models.
+service ril-daemon /system/bin/rild
+    class main
+    socket rild stream 660 root radio
+    socket rild-debug stream 660 radio system
+    socket rild-cas stream 660 casdrm mmb
+    user root
+    group radio cache inet misc audio log qcom_diag system drmrpc
+
+# DIAG
+service DIAG-daemon /system/bin/diagexe
+    class main
+    user root
+    group system radio inet net_raw
+
+# diag app for cp uart
+service diag_uart_log /system/bin/diag_uart_log
+    class main
+    user root
+    group radio
+
+# QMUX must be in multiple groups to support external process connections
+service qmuxd /system/bin/qmuxd
+    class main
+    user root
+    group radio audio bluetooth gps qcom_diag
+
+service diag_mdlog_start /system/bin/diag_mdlog
+    class late_start
+    user sdcard_rw
+    group system qcom_diag sdcard_rw sdcard_r media_rw
+    disabled
+    oneshot
+
+service diag_mdlog_stop /system/bin/diag_mdlog -k
+    class late_start
+    user sdcard_rw
+    group system qcom_diag sdcard_rw sdcard_r media_rw
+    disabled
+    oneshot
+
+#SLocation
+service cellgeofenced /system/bin/cellgeofenced
+    class main
+    socket cellgeofence seqpacket 0660 gps system
+    user gps
+    group system inet
+
+# service for NEXTI provisioning  app
+service secprov_nexti /system/bin/secprov_nexti
+    class main
+    user root
+    disabled
+    oneshot
+
+# start for NEXTI provisioning  app
+on property:sys.mobicoredaemon.enable=true
+	start secprov_nexti

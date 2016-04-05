@@ -1,0 +1,5 @@
+on early-init
+	setenforce permissive
+on boot
+ 	write /sys/class/android_usb/android0/idVendor 04E8
+    	write /sys/class/android_usb/android0/idProduct 6860

@@ -1,0 +1,7 @@
+#JPN DCM
+
+# NFC
+/dev/sec-nfc		0660	nfc	nfc
+/dev/sec-nfc-fn		0660	nfc	nfc
+/dev/felica_ant		0660	nfc	nfc
+/dev/ttySAC0		0660	nfc	nfc
