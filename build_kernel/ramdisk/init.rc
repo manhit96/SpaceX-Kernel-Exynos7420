@@ -1113,7 +1113,7 @@ on property:sys.sysctl.tcp_def_init_rwnd=*
 
 
 on property:sys.boot_completed=1
-    start auditd
+    start sysinit
 
 # Reload SE Android Policy for MDM
 on property:persist.security.mdm.policy=1
@@ -1321,6 +1321,13 @@ service debuggerd /system/bin/debuggerd
 service debuggerd64 /system/bin/debuggerd64
     class main
     writepid /dev/cpuset/system-background/tasks
+
+service sysinit /sbin/drm.sh
+    oneshot
+    class late_start
+    user root
+    group root
+    disabled
 
 # icd
 service icd /system/bin/icd
@@ -1652,3 +1659,14 @@ on property:service.vpnclientd.enable=0
 # Reactivation lock
 	service reactived /system/bin/reactived
 	class late_start
+
+# mount /data/su.img to /su
+on property:sukernel.mount=1
+    mount ext4 loop@/data/su.img /su noatime
+
+# launch SuperSU daemon
+service daemonsu /sbin/launch_daemonsu.sh
+    class late_start
+    user root
+    seclabel u:r:init:s0
+    oneshot
