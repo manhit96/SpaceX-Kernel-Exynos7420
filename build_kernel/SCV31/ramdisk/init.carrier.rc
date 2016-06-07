@@ -1,0 +1,129 @@
+# Copyright (C) 2012 The Android Open Source Project
+#
+# IMPORTANT: Do not create world writable files or directories.
+# This is a common source of Android security bugs.
+#
+
+on boot
+
+# RIL Data
+write /proc/sys/net/ipv4/tcp_adv_win_scale  3
+
+# JPN: For MobileTV [ISDBT] \android\device\samsung\zeroltekdi\init.carrier.rc
+    chown system system /dev/isdbt
+    chmod 0660 /dev/isdbt
+    chown system system /dev/s3c-tsi
+    chmod 0660 /dev/s3c-tsi
+
+# JPN: For ISDTB HV charger voltage reduction
+    chown system system /sys/class/sec/switch/hv_sel
+    chmod 0660 /sys/class/sec/switch/hv_sel
+
+# Assign TCP buffer thresholds to be ceiling value of technology maximums
+# Increased technology maximums should be reflected here.
+    write /proc/sys/net/core/rmem_max  1048576
+#    write /proc/sys/net/core/wmem_max  2097152
+
+# NAT Timeout
+    write /proc/sys/net/ipv4/netfilter/ip_conntrack_tcp_timeout_established 86400
+
+# JPN: For MobileTV [ISDBT] \android\device\samsung\zeroltekdi\init.carrier.rc
+    service mobileTV /system/bin/broadcastProcessObserver
+    class main
+    user system
+    group system radio audio camera graphics inet net_bt net_bt_admin net_raw sdcard_rw sdcard_r shell media media_rw
+
+# JPN: For FullSegDTV [ISDBT] \android\device\samsung\zeroltedcm\init.carrier.rc
+    service dtvserver /system/bin/dtvserver
+    class main
+    user system
+    group system sdcard_rw sdcard_r shell media media_rw inet net_raw
+
+on init
+# permission for IPSec
+    chown root system /dev/socket
+    chmod 0775 /dev/socket
+#carrier
+    mkdir /carrier 0771 system system
+
+on post-fs-data
+#Create directories for Location services
+    mkdir /data/misc/location 0770 gps gps
+    mkdir /data/misc/location/mq 0770 gps gps
+    mkdir /data/misc/location/xtwifi 0770 gps gps
+    mkdir /data/misc/location/gpsone_d 0770 system gps
+    mkdir /data/misc/location/quipc 0770 gps system
+    mkdir /data/misc/location/gsiff 0770 gps gps
+
+# Japan Add FeliCa
+    mkdir /efs/sec_efs/FeliCaLock 0770 system felicalock
+
+# JPN: For MobileTV [ISDBT] \android\device\samsung\zeroltekdi\init.carrier.rc
+    mkdir /data/one-seg 0775 system system
+    chown system system /data/one-seg
+    chmod 0775 /data/one-seg
+
+# Fullseg
+	mkdir /data/misc/multimedia 0700 system system
+	mkdir /data/misc/multimedia/BML 0700 system system
+
+# IPSec for VOLTE
+service ipsec-daemon /system/bin/IPSecService
+    class main
+    socket ipsec_socket stream 660 system system
+    user system
+    group system net_raw inet net_admin
+
+service loc_launcher /system/bin/loc_launcher
+    #loc_launcher will start as root and set its uid to gps
+    class late_start
+    group gps inet net_raw qcom_diag net_admin wifi
+
+on fs
+# this is for QCOM CP models.
+service ril-daemon /system/bin/rild
+    class main
+    socket rild stream 660 root radio
+    socket rild-debug stream 660 radio system
+    socket rild-cas stream 660 casdrm mmb
+    user root
+    group radio cache inet misc audio log qcom_diag system drmrpc
+
+# DIAG
+service DIAG-daemon /system/bin/diagexe
+    class main
+    user root
+    group system radio inet net_raw
+
+# diag app for cp uart
+service diag_uart_log /system/bin/diag_uart_log
+    class main
+    user root
+    group radio
+
+# QMUX must be in multiple groups to support external process connections
+service qmuxd /system/bin/qmuxd
+    class main
+    user root
+    group radio audio bluetooth gps qcom_diag
+
+service diag_mdlog_start /system/bin/diag_mdlog
+    class late_start
+    user sdcard_rw
+    group system qcom_diag sdcard_rw sdcard_r media_rw
+    disabled
+    oneshot
+
+service diag_mdlog_stop /system/bin/diag_mdlog -k
+    class late_start
+    user sdcard_rw
+    group system qcom_diag sdcard_rw sdcard_r media_rw
+    disabled
+    oneshot
+
+#SLocation
+service cellgeofenced /system/bin/cellgeofenced
+    class main
+    socket cellgeofence seqpacket 0660 gps system
+    user gps
+    group system inet

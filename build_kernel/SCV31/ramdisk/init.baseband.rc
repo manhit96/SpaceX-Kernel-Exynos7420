@@ -1,0 +1,132 @@
+on early-init
+    symlink /data/tombstones /tombstones
+    mkdir /cpdump 0771 system system
+
+on post-fs-data
+    mkdir /data/tombstones 0771 system system
+    mkdir /tombstones/modem 0771 system system
+    mkdir /tombstones/lpass 0771 system system
+    mkdir /tombstones/wcnss 0771 system system
+    mkdir /tombstones/dsps 0771 system system
+    mkdir /tombstones/mdm 0771 system system
+
+on boot
+    #Create QMUX deamon socket area for RIL
+    mkdir /dev/socket/qmux_radio 0770 radio radio
+    chmod 2770 /dev/socket/qmux_radio
+    mkdir /dev/socket/qmux_audio 0770 media audio
+    chmod 2770 /dev/socket/qmux_audio
+    mkdir /dev/socket/qmux_bluetooth 0770 bluetooth bluetooth
+    chmod 2770 /dev/socket/qmux_bluetooth
+    mkdir /dev/socket/qmux_gps 0770 gps gps
+    chmod 2770 /dev/socket/qmux_gps
+
+on fs
+#MDM requirement
+    mkdir /dev/block/modem
+    symlink /dev/block/platform/15570000.ufs/by-name/m9kefs1 /dev/block/modem/m9kefs1
+    symlink /dev/block/platform/15570000.ufs/by-name/m9kefs2 /dev/block/modem/m9kefs2
+    symlink /dev/block/platform/15570000.ufs/by-name/m9kefs3 /dev/block/modem/m9kefs3
+    symlink /dev/block/platform/15570000.ufs/by-name/ /dev/block/modem/dump_path
+    chown system radio /dev/block/modem/m9kefs1
+    chmod 0775 /dev/block/modem/m9kefs1
+    chown system radio /dev/block/modem/m9kefs2
+    chmod 0775 /dev/block/modem/m9kefs2
+    chown system radio /dev/block/modem/m9kefs3
+    chmod 0775 /dev/block/modem/m9kefs3
+    chown system radio /dev/block/modem/dump_path
+    chmod 0775 /dev/block/modem/dump_path
+
+
+    mkdir /firmware 0771 system system
+    mount vfat /dev/block/platform/15570000.ufs/by-name/RADIO /firmware ro shortname=lower fmask=0133,dmask=0022
+
+    chown system radio /dev/block/platform/15570000.ufs/by-name
+    chmod 0775 /dev/block/platform/15570000.ufs/by-name
+
+    mount tmpfs tmpfs /cpdump size=150M,mode=0700,uid=0,gid=0
+
+service mdm_helper /system/bin/mdm_helper
+    class core
+    onrestart setprop ro.service.mdm_helper_restarted "true"
+
+service mdm_helper_proxy /system/bin/mdm_helper_proxy
+    class core
+    disabled
+
+service umount_cpdump /system/bin/umount /cpdump
+    disabled
+    oneshot
+
+service irsc_util /system/bin/logwrapper /system/bin/irsc_util "/etc/sec_config"
+    class main
+    user root
+    oneshot
+
+on property:persist.airplane.mode.pwr.svg=enabled
+    setprop ro.mdm_helper_proxy_req false
+
+on property:init.svc.ril-daemon=running
+    setprop ro.mdm_helper_proxy_req true
+
+# Start mdm_helper_proxy
+on property:ro.mdm_helper_proxy_req=true
+    start mdm_helper_proxy
+
+# Stop mdm_helper_proxy in case of shutdown
+on property:sys.shutdown.requested=*
+    stop mdm_helper_proxy
+
+# Stop mdm_helper_proxy on EXYNOS target
+on property:ro.radio.noril=yes
+    stop mdm_helper_proxy
+
+on property:debug.mdm.cpdump_done=true
+    write /dev/kmsg "[init.baseband.rc] CP dump copy to tombstones begin"
+
+    copy /cpdump/CODERAM.BIN /tombstones/mdm/CODERAM.BIN
+    copy /cpdump/DATARAM.BIN /tombstones/mdm/DATARAM.BIN
+    copy /cpdump/DDRCS0.BIN  /tombstones/mdm/DDRCS0.BIN
+    copy /cpdump/load.cmm /tombstones/mdm/load.cmm
+    copy /cpdump/LPM.BIN /tombstones/mdm/LPM.BIN
+    copy /cpdump/mdm_err.txt /tombstones/mdm/mdm_err.txt
+    copy /cpdump/mdm_err.log /tombstones/mdm/mdm_err.log
+    copy /cpdump/MSGRAM.BIN /tombstones/mdm/MSGRAM.BIN
+    copy /cpdump/OCIMEM.BIN /tombstones/mdm/OCIMEM.BIN
+    copy /cpdump/PMIC_PON.BIN /tombstones/mdm/PMIC_PON.BIN
+    copy /cpdump/RST_STAT.BIN /tombstones/mdm/RST_STAT.BIN
+    copy /cpdump/IPA_DRAM.BIN /tombstones/mdm/IPA_DRAM.BIN
+    copy /cpdump/IPA_IRAM.BIN /tombstones/mdm/IPA_IRAM.BIN
+    copy /cpdump/IPA_REG1.BIN /tombstones/mdm/IPA_REG1.BIN
+    copy /cpdump/IPA_REG2.BIN /tombstones/mdm/IPA_REG2.BIN
+    copy /cpdump/IPA_REG3.BIN /tombstones/mdm/IPA_REG3.BIN
+
+    chown system radio /tombstones/mdm/CODERAM.BIN
+    chown system radio /tombstones/mdm/DATARAM.BIN
+    chown system radio /tombstones/mdm/DDRCS0.BIN
+    chown system radio /tombstones/mdm/load.cmm
+    chown system radio /tombstones/mdm/LPM.BIN
+    chown system radio /tombstones/mdm/mdm_err.log
+    chown system radio /tombstones/mdm/mdm_err.txt
+    chown system radio /tombstones/mdm/MSGRAM.BIN
+    chown system radio /tombstones/mdm/OCIMEM.BIN
+    chown system radio /tombstones/mdm/PMIC_PON.BIN
+    chown system radio /tombstones/mdm/RST_STAT.BIN
+    chown system radio /tombstones/mdm/IPA_DRAM.BIN
+    chown system radio /tombstones/mdm/IPA_IRAM.BIN
+    chown system radio /tombstones/mdm/IPA_REG1.BIN
+    chown system radio /tombstones/mdm/IPA_REG2.BIN
+    chown system radio /tombstones/mdm/IPA_REG3.BIN
+
+    write /dev/kmsg "[init.baseband.rc] CP dump copy to tombstones done"
+
+on property:sys.boot_completed=1
+    symlink /sys/module/mhi_uci/parameters/mhi_uci_dump /dev/qmi_dump
+    chown root radio /sys/module/mhi_uci/parameters/mhi_uci_dump
+    chmod 0664 /sys/module/mhi_uci/parameters/mhi_uci_dump
+    write /sys/module/mhi_uci/parameters/mhi_uci_dump 2
+
+    write /sys/class/net/rmnet_mhi0/queues/rx-0/rps_cpus 1
+
+on property:debug.mdm.cpboot_done=true
+    start umount_cpdump
