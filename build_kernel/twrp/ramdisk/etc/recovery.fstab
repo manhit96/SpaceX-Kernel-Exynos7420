@@ -1,0 +1,8 @@
+/boot		emmc		/dev/block/platform/15570000.ufs/by-name/BOOT
+/recovery		emmc		/dev/block/platform/15570000.ufs/by-name/RECOVERY
+/system		ext4		/dev/block/platform/15570000.ufs/by-name/SYSTEM
+/data		ext4		/dev/block/platform/15570000.ufs/by-name/USERDATA	flags=encryptable=footer;length=-20480
+/cache		ext4		/dev/block/platform/15570000.ufs/by-name/CACHE
+/modem		emmc		/dev/block/platform/15570000.ufs/by-name/RADIO	flags=backup=1;display="Modem"
+/efs			ext4		/dev/block/platform/15570000.ufs/by-name/EFS		flags=backup=1;display="EFS"
+/usbstorage	vfat		/dev/block/sdd1 /dev/block/sdd				flags=display="USB Storage";storage;wipeingui;removable
